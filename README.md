@@ -4,6 +4,8 @@ Two fictional retailers share a returns desk. An agent asks, "What is the standa
 
 **Start here:** [16-week build and fieldwork plan](docs/field-course/plan.md) · [original eight-week customer engagement](docs/engagement-plan.md) · [45-minute week-one workbook](docs/week-one-workbook.md) · [operator and maintainer runbook](docs/operator-runbook.md). For an offline, printable edition, open [docs/field-course/plan.html](docs/field-course/plan.html) in a browser after cloning. The reference implementation is complete; the measurements, incidents and release decisions in the course are **your** work.
 
+**Companion lab:** [Breakwater: the bank outage evidence lab](labs/breakwater/) asks what a fictional Australian bank can tell its incident commander at three points during a payments outage. Try the tabletop first, then compare your briefs with the [step-by-step solution](labs/breakwater/SOLUTION.md).
+
 ## Get it running
 
 Use CPython **3.11 or newer** with SQLite support and Git (or download and extract this repository's ZIP). No API keys, model download, GPU, database server or `pip install`. Only obtaining the repository requires network access. Run from the directory that contains `relaydesk/` and `data/`.

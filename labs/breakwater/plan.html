@@ -1,0 +1,366 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Breakwater | The bank outage evidence lab</title><style>*{box-sizing:border-box}html{background:#f4f6f7;color:#172c33;font:17px/1.53 system-ui,sans-serif}body{max-width:70rem;margin:0 auto;background:white;padding:2.1rem 3rem 4rem}header{font-weight:700;letter-spacing:.13em;color:#196252;font-size:.78rem}h1{font-size:2.5rem;line-height:1.04;letter-spacing:-.03em;color:#123e40}h2{font-size:1.5rem;margin-top:2.3rem;padding-top:.45rem;border-top:2px solid #639988;color:#123e40}h3{font-size:1.12rem}table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0}td,th{padding:.52rem .6rem;border:1px solid #b2c5bd;vertical-align:top;text-align:left}th{background:#e2eee8}blockquote{padding:.8rem 1.1rem;background:#edf5ee;border-left:4px solid #367762;margin:1rem 0}blockquote p{margin:0}pre{padding:1rem;background:#f1f5f4;overflow:auto;line-height:1.3}code{color:#1b5043}a{color:#145c63}li{margin:.4rem 0}@media(max-width:700px){body{padding:1rem}table{display:block;overflow-x:auto}h1{font-size:2rem}}@page{size:A4;margin:16mm 15mm}@media print{html,body{background:white}body{padding:0;max-width:none;font:10.4pt/1.35 Arial,sans-serif}h1{font-size:26pt}h2{font-size:15pt;margin-top:1.2em;break-after:avoid}h3,thead{break-after:avoid}table{font:9.1pt/1.28 Arial,sans-serif;display:table}td,th{padding:5pt}th{background:#e2eee8}tr,pre,blockquote{break-inside:avoid}p{orphans:3;widows:3}pre{font:8.7pt/1.28 monospace}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><header>FIELD LAB 02 &nbsp; / &nbsp; AUSTRALIAN FINANCIAL SERVICES</header><main><h1 id="breakwater-the-bank-outage-evidence-lab">Breakwater | The bank outage evidence lab</h1>
+<p><strong>A 12-week forward-deployed AI engineering engagement in Australian financial services.</strong> Solo or in pairs; allow 4-6 hours a week. You work inside Tidemark Mutual, a fictional authorised deposit-taking institution. The payments team wants a useful incident brief before its next executive call. Operational Risk wants to be able to reconstruct what the team actually knew at the time. Both are your customers.</p>
+<blockquote>
+<p><strong>The opening question:</strong> It is 08:25 UTC. The gateway provider says payments are green. Can the incident commander tell the executive team that outbound payments have recovered? Find the evidence you would stake that sentence on. If it does not exist, write the sentence you <em>can</em> defend instead.</p>
+</blockquote>
+<h2 id="what-you-get-and-what-you-build">What you get and what you build</h2>
+<table>
+<thead>
+<tr>
+<th>Supplied in this kit</th>
+<th>Your engineering work</th>
+<th>Explicitly out of scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A printable field guide; a synthetic incident with late and conflicting-looking evidence; a versioned tolerance register; an offline Python reference; a tabletop and facilitator key.</td>
+<td>Benchmark manual work; compare retrieval approaches; implement and evaluate one AI improvement; design dual review; run a failure exercise; recommend a shadow pilot or a no-go.</td>
+<td>Live bank feeds, payment instructions, customer records, real notifications, legal advice, certification, or a decision that a regulatory obligation has or has not been triggered.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Day zero.</strong> Unpack the kit. For the paper exercise, nothing else is needed. For the reference, use Python 3.11+; from the folder containing <code>desk.py</code>, run <code>python desk.py brief 08:25</code>, then <code>python desk.py search 08:25 "gateway recovered"</code> and <code>python desk.py brief 09:10</code>. On Windows use <code>py -3</code> if needed. No packages, network, keys or model download. The reference ranks text and computes a draft from already-structured evidence; it does not pretend to turn arbitrary bank documents into verified facts.</p>
+<h2 id="1-get-the-customer-contract-right">1 | Get the customer contract right</h2>
+<table>
+<thead>
+<tr>
+<th>Counterparty</th>
+<th>Ask them to show you</th>
+<th>Record the decision, not just the answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incident commander</td>
+<td>The last brief they had to walk back. Was the cause missing evidence, late evidence, or ambiguous language?</td>
+<td>Define each permissible claim, who owns it, and how the manual bridge keeps running when the tool is down.</td>
+</tr>
+<tr>
+<td>Payments and reconciliation leads</td>
+<td>Which signal means the <strong>customer operation</strong> recovered? Who can attest to permanently lost instructions?</td>
+<td>Give each fact type one authoritative source in the exercise. A green component is not a restored payment service. An unmatched instruction is not necessarily lost.</td>
+</tr>
+<tr>
+<td>Operational Risk / Legal</td>
+<td>How they receive facts, track the incident clock, and decide whether an obligation needs action.</td>
+<td>The desk escalates evidence and uncertainty. These teams retain interpretation and reporting responsibility through their existing process. Never wait for a complete AI brief before alerting them.</td>
+</tr>
+<tr>
+<td>Privacy, records and internal audit</td>
+<td>What proof a reviewer may see, what must be retained, and what must never appear in a general operations packet.</td>
+<td>Specify the access basis, retention owner, and audit sample. Audit can reconstruct a packet without receiving restricted source material.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sponsor hypothesis, not a result:</strong> a reviewer can prepare a <em>defensible</em> first brief 25% faster than manually, including time correcting drafts, without a single prohibited citation or false assurance in the frozen exercise. Do not equate retrieval speed with time saved by the bank.</p>
+<h3 id="regulatory-anchor-versus-simulation">Regulatory anchor versus simulation</h3>
+<p>The primary reading is <a href="https://www.apra.gov.au/standards/cps-230">APRA CPS 230 Operational Risk Management</a>, in-force version commencing <strong>1 July 2026</strong>, checked <strong>18 November 2026</strong>. Read the sections <em>Critical operations and tolerance levels</em>, <em>Business continuity plan</em>, <em>Operational risk incidents</em> and <em>Testing and review</em>. The standard addresses disruption duration, data loss and minimum service levels under alternative arrangements, and includes separate governance, testing and notification requirements.</p>
+<p><strong>APRA does not supply the numbers in this lab.</strong> The fictional operation, source authority, evaluation batch, units, thresholds and release gates below are teaching assumptions. A comparison outside an internal tolerance is a reason for human attention, not software's finding of a legal breach. A comparison inside tolerance is <strong>not</strong> a conclusion that no notification is due. A real institution must validate applicability, triggers, clocks and escalation routes with its own accountable specialists.</p>
+<h2 id="2-run-the-first-45-minutes-without-ai">2 | Run the first 45 minutes without AI</h2>
+<p>Give one person the incident bridge and another the reviewer chair; if solo, timestamp your first answer before opening the key. All times are UTC on <strong>14 October 2026</strong>. Tidemark's case is <code>PAY-07</code>; audience is <code>ops</code>. The applicable policy is the approved version effective at incident start and already published by the brief's cutoff.</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Effective interval: start inclusive, end exclusive</th>
+<th style="text-align: right;">Maximum disruption</th>
+<th style="text-align: right;">Maximum permanently lost instructions</th>
+<th style="text-align: right;">Minimum accepted share of fallback batch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P3</td>
+<td>1 Oct to 1 Nov 2026</td>
+<td style="text-align: right;">45 min</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">80%</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>1 Nov 2026 onward; already published on 12 Oct</td>
+<td style="text-align: right;">60 min</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">75%</td>
+</tr>
+</tbody>
+</table>
+<p>For <strong>this exercise only</strong>, fallback service is measured on the reconciled <em>fixed batch</em> FB-1, not the entire disruption. The number of eligible unique instructions is the denominator. The equality boundary meets the internal threshold. A zero denominator is unknown, not 100%. The duration calculation needs authoritative start and end observations; while the end is missing the desk does not invent a final duration.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Observed</th>
+<th>Available to desk</th>
+<th>Evidence card</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E01</td>
+<td>08:00</td>
+<td>08:02</td>
+<td>Payments control: outbound operation disrupted.</td>
+</tr>
+<tr>
+<td>E02</td>
+<td>08:17</td>
+<td>08:18</td>
+<td>Provider: gateway component green. No end-to-end assertion.</td>
+</tr>
+<tr>
+<td>X01</td>
+<td>08:18</td>
+<td>08:19</td>
+<td>Another institution and incident: service recovered. Not available for this brief.</td>
+</tr>
+<tr>
+<td>X02</td>
+<td>08:20</td>
+<td>08:21</td>
+<td>Restricted reconciliation workpaper. Outside the ops audience; do not cite even its ID in the brief.</td>
+</tr>
+<tr>
+<td>E03</td>
+<td>08:20</td>
+<td>08:24</td>
+<td>Fallback controller: 80 of 100 eligible FB-1 instructions accepted.</td>
+</tr>
+<tr>
+<td>E04</td>
+<td>08:48</td>
+<td>08:53</td>
+<td>Payments control: end-to-end outbound service restored.</td>
+</tr>
+<tr>
+<td>E05</td>
+<td>08:50</td>
+<td>09:03</td>
+<td>Reconciliation lead: signed final loss count of zero.</td>
+</tr>
+<tr>
+<td>E06</td>
+<td>08:20</td>
+<td>09:08</td>
+<td>Fallback controller corrects E03 for <strong>the same batch</strong>: 79 of 100 accepted. The correction does not change what an earlier reviewer could have known.</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>0-10 min:</strong> agree what recovery means. Cover everything not available at 08:25. Draft a three-sentence update with evidence IDs, an unknown and its owner. Start a timer.</li>
+<li><strong>10-20 min:</strong> repeat at 08:55. A manager says, "The next policy gives us an hour." Decide which register entry you used and why. Does an unresolved loss count prevent escalation of a known duration exception?</li>
+<li><strong>20-30 min:</strong> repeat at 09:10. Identify the changed measures. Can you reproduce the early packet unchanged after seeing the correction?</li>
+<li><strong>30-45 min:</strong> compare your packets with the reference and the key at the end. Record manual minutes, any unsupported assertion, and the next person who must act. Keep these teaching snapshots out of the acceptance set.</li>
+</ol>
+<h2 id="3-system-design-where-ai-earns-its-place">3 | System design: where AI earns its place</h2>
+<pre><code class="language-text">Synthetic receipts ----&gt; identity, case, audience and as-of filters
+                                     |
+                       +-------------+----------------+
+                       |                              |
+                  rank permitted notes          verified typed facts
+                  (AI experiment here)          + effective policy
+                       |                              |
+                  candidate excerpts              exact arithmetic
+                       +-------------+----------------+
+                                     |
+                           reviewer sees a draft
+                     + evidence IDs + gaps + cutoff
+                                     |
+                         separate human risk process
+</code></pre>
+<p><strong>Make two clocks first-class.</strong> <code>observed</code> says when the fact pertains to the operation; <code>received</code> says when the desk could know it. Apply both cutoffs, entity, incident and audience <em>before</em> building the candidate index. For policy, check approved publication time and effective interval separately. The executable fixes the identity and incident scope to one synthetic desk; a production system must derive them from trusted identity and case entitlements, never from text in a prompt.</p>
+<p><strong>Baseline versus candidate.</strong> The reference uses sparse TF-IDF cosine similarity to rank eligible notes. Try “gateway recovered.” Ranking the provider note is useful for finding what was said; it does not make the note an authority for recovery. The structured comparison deliberately reads <strong>all</strong> eligible authoritative facts regardless of the ranker's top-k. For your experiment, choose a local embedding reranker <em>or</em> a constrained extraction model. Compare on the same permitted candidates. For extraction, propose <code>{fact_type, value, units, source_id, quoted_span}</code>; reject proposals without an exact matching excerpt and an authorised source. A quote match establishes provenance, not truth. Model failure must leave manual lookup available.</p>
+<p><strong>Packet and conflict contract.</strong> Include scope, cutoff, policy ID, observed values and units, per-measure status and citation IDs, then gaps and owners. Do not silently use the newest row: a later correction needs an explicit same-source, same-fact predecessor. Incomparable eligible facts make that measure unknown. Any established outside-tolerance fact flags the packet even if another measure is unknown; otherwise missing evidence yields an incomplete packet. Only complete internal comparisons with none outside yield a ready-for-review packet. None of these states means “compliant,” “safe,” or “send.”</p>
+<p><strong>Operational design to implement during the course.</strong> Separate the preparer from the risk reviewer. Bind review to an immutable packet version and manifest; a late receipt creates a new revision, not an edit to a signed one. Capture reviewer role, decision, reason, time and previous packet reference. Store raw evidence separately under source permissions. Operational metrics contain case pseudonyms and counts, not transcripts. A hash can detect changed bytes against a trusted reference; it does not authenticate a source, grant access, or by itself make a store immutable. In production, review access, legal holds, deletion, and data residency with actual control owners.</p>
+<h2 id="4-twelve-weekly-customer-engagements">4 | Twelve weekly customer engagements</h2>
+<p>Use the same cadence each week: agree on one decision with its owner; run the smallest experiment that could change it; finish with a five-minute demo of the worst case as well as the best. If a partner plays a customer, record that sign-off as simulated.</p>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Your assignment</th>
+<th>Demo artifact and exit criterion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Sit on the incident bridge</strong></td>
+<td>Run the tabletop by hand. Interview the commander and Risk separately. Compare the language each considers supportable.</td>
+<td>A one-page charter, three timed packets and a named escalation owner. Gate: both roles can explain why “gateway green” is insufficient.</td>
+</tr>
+<tr>
+<td><strong>2. Map evidence authority</strong></td>
+<td>Map each source to facts, units, permitted readers, correction semantics and an accountable owner. Ask what “loss” excludes.</td>
+<td>A data contract plus one valid and one invalid example per measure. If the denominator owner cannot define FB-1, that measure stays unknown.</td>
+</tr>
+<tr>
+<td><strong>3. Build point-in-time replay</strong></td>
+<td>Draw event time and desk receipt time on two axes. Test immediately before and at a receipt, before a policy cutover, and with an overlap.</td>
+<td>Replay diff. No future, wrong-entity or restricted card may enter the searchable set or packet. Record why a published future policy was rejected.</td>
+</tr>
+<tr>
+<td><strong>4. Establish retrieval baselines</strong></td>
+<td>Compare manual scan, exact keyword matching and the supplied TF-IDF search. Have a second reader label relevant allowed cards for 15 queries.</td>
+<td>A case-by-case top-3 relevance sheet. Keep misses and empty permitted sets. Pick a baseline to beat, not a favourite model.</td>
+</tr>
+<tr>
+<td><strong>5. Trial one AI improvement</strong></td>
+<td>Add paraphrases, acronyms and ambiguous vendor language. Run the candidate on the same frozen candidate lists as the baseline.</td>
+<td>Side-by-side evidence IDs, retrieval quality, cold/warm latency and cost per reviewed packet. Gate: show a query that improves and one that does not, or retain the simpler baseline.</td>
+</tr>
+<tr>
+<td><strong>6. Make claims reproducible</strong></td>
+<td>Implement a packet validator. Test exactly 45 minutes, 46 minutes, 80/100, 79/100, zero denominator, missing loss, and two competing receipts with no correction link.</td>
+<td>Unit-tagged expected values and citations. Any unsupported “within” on an unknown measure blocks release.</td>
+</tr>
+<tr>
+<td><strong>7. Design review and records</strong></td>
+<td>Sketch preparer/reviewer roles, version IDs, storage boundaries and retention ownership. Attempt a self-approval in your synthetic harness; replay an old signed packet after correction.</td>
+<td>Decision history and a rejected self-approval. A reviewer must be able to return the packet without blocking the existing incident bridge.</td>
+</tr>
+<tr>
+<td><strong>8. Run the provider-failure exercise</strong></td>
+<td>Have the facilitator delay reconciliation and stop the retrieval component. A support engineer volunteers raw transaction details: use a synthetic receipt instead.</td>
+<td>A timeline, manual fallback brief, corrective action and owner. Gate: staff can escalate a known exception without the AI, and without waiting for the missing field.</td>
+</tr>
+<tr>
+<td><strong>9. Build independent assurance</strong></td>
+<td>Use distinct synthetic incidents, not time-shifted copies of PAY-07 alone. Freeze labels and allowed evidence before tuning. Have the second-line role adjudicate disputes.</td>
+<td>A signed-off exercise set, error ledger and held-out results by hard slice. Publish both numerator and denominator, including empty slices.</td>
+</tr>
+<tr>
+<td><strong>10. Prove the operating model</strong></td>
+<td>Estimate steady and burst review capacity, propose an on-call owner, and compare the AI candidate with the manual workflow end to end.</td>
+<td>Queue worksheet and load-shedding rule. If the queue is unstable, narrow scope or keep the manual path; a faster ranker is not a staffing plan.</td>
+</tr>
+<tr>
+<td><strong>11. Shadow without sending</strong></td>
+<td>Counterbalance manual-first and assisted-first runs on matched synthetic cases. Count corrections, handoffs and reviewer minutes. A short draft that takes longer to verify is not a win.</td>
+<td>Sponsor memo: go, limited go, or no-go for <em>synthetic shadow use</em>. Name the stop threshold and the person who can stop the pilot.</td>
+</tr>
+<tr>
+<td><strong>12. Hand over and defend</strong></td>
+<td>A peer replays a historic packet, introduces a late correction, disables AI ranking and produces a manual brief without help. Present your rejected architecture and worst failure.</td>
+<td>Runbook, model/evidence card, release memo and a recorded five-minute customer demo. Gate: someone other than the builder can reconstruct and challenge the output.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-blocker-playbook">5 | Blocker playbook</h2>
+<table>
+<thead>
+<tr>
+<th>Inject / signal</th>
+<th>What to inspect first</th>
+<th>Owner, response and proof to resume</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Executive wants one green tick while evidence is missing</td>
+<td>Was “unknown” collapsed to a number? Is the packet label hiding a per-measure flag?</td>
+<td>Risk lead: separate known exceptions and unknowns. Resume when both can appear on one packet.</td>
+</tr>
+<tr>
+<td>Search looks excellent but historic packets change</td>
+<td>Check corpus filtering before indexing, model version, both clocks and policy publication versus effective date.</td>
+<td>FDE: freeze the manifest and replay an earlier cutoff after a correction; evidence IDs must not change.</td>
+</tr>
+<tr>
+<td>Provider promises that all payments cleared</td>
+<td>Identify which component the note covers and which source can attest to customer-facing restoration.</td>
+<td>Payments lead: seek end-to-end evidence. Keep the note as context only; never let similarity change authority.</td>
+</tr>
+<tr>
+<td>A ledger extract is delayed or restricted</td>
+<td>Distinguish “cannot access,” “not reconciled,” and an authoritative final zero. Do not expose restricted IDs in ops telemetry.</td>
+<td>Reconciliation owner issues an approved aggregate receipt. Restore the claim only after an eligible receipt arrives.</td>
+</tr>
+<tr>
+<td>Two teams quote different fallback percentages</td>
+<td>Check batch identity, numerator, denominator and explicit correction link before comparing percentages.</td>
+<td>Control owner reconciles the cohort. Competing live facts must not resolve by rank or arrival order.</td>
+</tr>
+<tr>
+<td>The expensive model improves recall but reviews back up</td>
+<td>Count analyst minutes including rejected packets. At 12 packets/hour and 7 min each, demand is 84 reviewer-minutes/hour; one reviewer cannot keep up.</td>
+<td>Sponsor narrows the pilot or reserves capacity. Demonstrate that the fallback still works under burst load.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-evaluation-and-pilot-contract">6 | Evaluation and pilot contract</h2>
+<p>Measure at incident level as well as packet level; ten revisions of one outage are not ten independent outages. The thresholds below are <strong>proposed lab targets</strong>, not measured results or regulatory minima.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Proposed gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Evidence exposure</td>
+<td>Prohibited, wrong-case or future card IDs in search results, packets or ordinary logs / inspected outputs</td>
+<td>Zero occurrences; any occurrence stops the exercise immediately. Inspect actual IDs, not just a rate rounded to zero.</td>
+</tr>
+<tr>
+<td>False assurance</td>
+<td>Unknown/outside gold measure labelled within / all gold unknown-or-outside measures</td>
+<td>Zero on frozen exercise. Test missing receipts, zero denominator, authority mismatch and corrections.</td>
+</tr>
+<tr>
+<td>Missed exception</td>
+<td>Gold outside measures not flagged outside / all gold outside measures</td>
+<td>Zero; also count correct flags with an independently missing field.</td>
+</tr>
+<tr>
+<td>Evidence recall@3</td>
+<td>Relevant permitted IDs in first three / labelled relevant permitted IDs, macro-averaged over queries with relevant evidence</td>
+<td>Target 85%; report no-answer queries separately. A failed search is never a reason to call an operation healthy.</td>
+</tr>
+<tr>
+<td>Useful complete packets</td>
+<td>Correct fully cited packets / gold-completable snapshots</td>
+<td>Target at least 80% while meeting the hard gates. Refusing everything is not a working alternative.</td>
+</tr>
+<tr>
+<td>Operator value</td>
+<td>Paired total minutes from brief request to reviewer decision, including rejected drafts; publish median within-pair percentage change and sample size</td>
+<td>Target at least 25% reduction on 20 or more paired tasks. Report slower cases and decision uncertainty.</td>
+</tr>
+</tbody>
+</table>
+<p>Build a frozen set with <strong>at least 24 snapshots across six distinct synthetic incidents</strong>. Include restricted and wrong-entity notes, out-of-order receipts, policy boundaries, contradictory authoritative facts, equality, known exception with a missing field, and entirely complete within-tolerance cases. Assign incidents to development or acceptance <strong>before</strong> creating paraphrases. If a denominator is zero, report N/A and add coverage; do not count it as a pass. These numbers justify at most a scoped synthetic shadow decision, never production accreditation.</p>
+<p><strong>Stop and rollback:</strong> stop generating candidate packets on any access leak, false assurance or lost confirmed exception. The commander continues the existing manual incident bridge immediately; never stop the bank's incident response. Preserve permitted evidence and the failed manifest for investigation. The FDE reverts to the last approved model/data contract; an independent reviewer reproduces the failure and reruns the frozen set before resuming shadow use.</p>
+<h2 id="7-portfolio-and-facilitator-key">7 | Portfolio and facilitator key</h2>
+<p><strong>What to take to an FDE interview:</strong> one customer objection that changed the design; a two-clock data-flow drawing; a baseline-versus-candidate result including its worst miss; an incident/rollback note; and a one-page release decision. A credible no-go beats a polished demo that quietly accepts future evidence.</p>
+<p><strong>Release memo template:</strong> Requested decision / bounded population and excluded uses / sample size / hard-gate counts / useful coverage and reviewer minutes / worst counterexample / unresolved control and owner / recommendation and rollback trigger.</p>
+<p><strong>Facilitator key - read after the first timed pass:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Cutoff</th>
+<th>Supportable internal comparisons</th>
+<th>What the reviewer should say</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>08:25</td>
+<td>P3. Duration unknown; loss unknown; FB-1 80/100 = 80%, meets the floor (E03).</td>
+<td>“We have evidence the gateway component recovered, not that outbound payments recovered. Payments control owns restoration evidence; reconciliation owns the loss figure.” Do not cite the excluded cards.</td>
+</tr>
+<tr>
+<td>08:55</td>
+<td>P3. E01 + E04 = 48 minutes, <strong>3 over</strong>; FB-1 still 80%; loss unknown.</td>
+<td>Flag the duration to the human incident/risk process now. Do not wait for reconciliation, use P4's 60 minutes, or declare that a regulatory notification has been decided.</td>
+</tr>
+<tr>
+<td>09:10</td>
+<td>P3. Duration still 48; signed loss 0 (E05); corrected FB-1 79/100 = 79% (E06), <strong>1 percentage point below</strong> the floor.</td>
+<td>Show two internal exceptions, attach the correction and issue a new draft. The 08:25 draft still correctly reflects E03 as of its cutoff.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The final design question:</strong> If a better model cannot change the allowable facts, where can it still create value? Demonstrate less analyst search or verification time on unfamiliar incident language, with the same scope, authority and escalation guarantees. If you cannot, recommend the baseline.</p></main></body></html>

@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-14",
+  "scope": {"entity": "TM-AU", "case": "PAY-07", "audience": "ops"},
+  "operation": "outbound-payments",
+  "register": [
+    {"id":"P3","entity":"TM-AU","operation":"outbound-payments","published":"2026-09-25","from":"2026-10-01","until":"2026-11-01","max_minutes":45,"max_lost":0,"min_percent":80},
+    {"id":"P4","entity":"TM-AU","operation":"outbound-payments","published":"2026-10-12","from":"2026-11-01","until":null,"max_minutes":60,"max_lost":0,"min_percent":75}
+  ],
+  "cards": [
+    {"id":"E01","entity":"TM-AU","case":"PAY-07","audience":"ops","observed":"08:00","received":"08:02","source":"payments-control","kind":"start","text":"Outbound payments disruption began. End-to-end customer payment probe failed."},
+    {"id":"E02","entity":"TM-AU","case":"PAY-07","audience":"ops","observed":"08:17","received":"08:18","source":"gateway-provider","kind":"note","text":"Gateway component recovered and is green. Payment completion is not confirmed."},
+    {"id":"X01","entity":"OTHER-AU","case":"PAY-91","audience":"ops","observed":"08:18","received":"08:19","source":"payments-control","kind":"end","text":"Outbound payments recovered at a different fictional institution."},
+    {"id":"X02","entity":"TM-AU","case":"PAY-07","audience":"restricted","observed":"08:20","received":"08:21","source":"reconciliation","kind":"loss","lost":9,"text":"Restricted training workpaper. Synthetic placeholder only."},
+    {"id":"E03","entity":"TM-AU","case":"PAY-07","audience":"ops","observed":"08:20","received":"08:24","source":"fallback-control","kind":"batch","batch":"FB-1","accepted":80,"eligible":100,"text":"Fallback service: 80 of 100 eligible FB-1 payment instructions accepted."},
+    {"id":"E04","entity":"TM-AU","case":"PAY-07","audience":"ops","observed":"08:48","received":"08:53","source":"payments-control","kind":"end","text":"End-to-end outbound payments restored. Service recovery confirmed by payments control."},
+    {"id":"E05","entity":"TM-AU","case":"PAY-07","audience":"ops","observed":"08:50","received":"09:03","source":"reconciliation","kind":"loss","lost":0,"text":"Final reconciliation signed. Zero permanently lost instructions."},
+    {"id":"E06","entity":"TM-AU","case":"PAY-07","audience":"ops","observed":"08:20","received":"09:08","source":"fallback-control","kind":"batch","batch":"FB-1","accepted":79,"eligible":100,"supersedes":"E03","text":"Correction for the same fallback service batch: 79 of 100 eligible FB-1 instructions accepted."}
+  ]
+}
