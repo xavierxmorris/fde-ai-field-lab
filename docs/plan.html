@@ -1,0 +1,155 @@
+<!doctype html><html lang='en'><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>RelayDesk field engagement</title><style>body{font:17px/1.6 system-ui;color:#162536;margin:2.5rem auto;max-width:76rem;padding:0 1.5rem}h1,h2{line-height:1.15}h1{color:#154469}h2{border-top:2px solid #aac;padding-top:.7rem}table{border-collapse:collapse;width:100%;font-size:.92em}td,th{border:1px solid #b9c9d4;padding:.5rem;text-align:left;vertical-align:top}th{background:#e8f1f7}code{background:#edf1f3;padding:.08em .25em}@media print{body{font:10pt/1.35 sans-serif;margin:0}tr{break-inside:avoid}h2{break-after:avoid}}</style><main><h1 id="relaydesk-the-eight-week-field-engagement">RelayDesk: the eight-week field engagement</h1>
+<p>You are the forward-deployed engineer embedded with a fictional shared returns desk. A support lead says, &quot;People keep pasting the wrong retailer's returns window. Make us faster.&quot; That is a complaint, not a specification. Your deliverable is a release decision backed by evidence, not a chatbot that always answers. Budget <strong>5-7 hours a week</strong> for one person. In a team, rotate the operator, engineer and skeptical customer roles. All people, tickets, policies and targets in the lab are simulated.</p>
+<h2 id="contract-before-code">Contract before code</h2>
+<p><strong>User:</strong> a support agent comparing a ticket with a policy, not a shopper. <strong>Input:</strong> a retailer, the policy lookup date and a short question. <strong>Output:</strong> one verbatim, versioned policy excerpt or a handoff reason. A draft can be accepted or rejected by a human; accepting is not an entitlement decision. No money moves and no messages are sent. The initial customer authorizes synthetic data and a single-user, offline pilot only. Live customer data, eligibility decisions, SSO, production hosting and autonomous refunds are out of scope.</p>
+<table>
+<thead>
+<tr>
+<th>Counterparty</th>
+<th>Ask in discovery</th>
+<th>Evidence they need to sign off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Desk lead (sponsor)</td>
+<td>Is policy lookup or order lookup the bottleneck? What would you stop doing?</td>
+<td>Paired timing with and without assistance, including failed lookups.</td>
+</tr>
+<tr>
+<td>Returns specialist (operator)</td>
+<td>Walk me through one ordinary return and one exception. Where would you challenge the draft?</td>
+<td>Exact excerpt, retailer, source version, date, and an easy way to reject.</td>
+</tr>
+<tr>
+<td>Policy owner</td>
+<td>When an amendment takes effect, do you use order, delivery or contact date? Who resolves overlaps?</td>
+<td>Written date semantics, cutover and overlap cases signed off.</td>
+</tr>
+<tr>
+<td>Platform/privacy owner</td>
+<td>Who assigns retailer identity? Where does ticket text persist? What would prevent a real-data rollout?</td>
+<td>Data-flow diagram, retention proposal and tested stop procedure.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Initial decision:</strong> the operator supplies a <em>policy lookup date</em>, not a claim that today's policy governs an order. Real event-date rules are unresolved until the policy owner signs them. <strong>Success hypothesis:</strong> reduce median policy-lookup time by 25% without increasing wrong-policy use. This is a target, not a measured result. Track medians on matched tasks and rejections/abstentions separately so faster easy cases cannot conceal slower hard ones.</p>
+<h2 id="detailed-schedule">Detailed schedule</h2>
+<table>
+<thead>
+<tr>
+<th>Week / focus</th>
+<th>Work in order</th>
+<th>Deliverable, demo and exit gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Find the job</strong></td>
+<td>Run the three-stop demo. Role-play the four interviews above. Manually answer six tickets without the assistant. Time from reading the ticket to locating the excerpt. Mark where you needed an order record or manager. Write down what the sponsor initially asked for versus what agents actually needed.</td>
+<td>One-page charter, case timings, non-goals and a proposed pilot owner. Demo one case the tool should <em>not</em> handle. Gate: both sponsor and policy owner can state the same refusal boundary.</td>
+</tr>
+<tr>
+<td><strong>2. Turn messy data into a contract</strong></td>
+<td>Inventory every policy by tenant, topic, version and effective interval. Trace a Northstar return on either side of the change date. Make a scratch copy of the fixtures; introduce one gap and one overlapping interval. Decide which anomalies should fail ingestion and which should fail closed at lookup.</td>
+<td>Data dictionary, data lineage sketch and two negative examples. Gate: no old or future text is used on either boundary; overlapping applicable versions do not silently win a tie.</td>
+</tr>
+<tr>
+<td><strong>3. Build the first retrieval path</strong></td>
+<td>Trace one question from tokenization through intent prediction and evidence selection. Compare the scoped retrieval baseline to the gated pipeline on the supplied benchmark. Add five new paraphrases to a separate development file and classify failures as intent, retrieval or missing evidence.</td>
+<td>Two annotated request traces and a decision record: lexical vs embedding/hybrid retrieval for <em>this</em> corpus. Gate: demonstrate one case where refusing rather than retrieving is valuable and one where caution hurts coverage.</td>
+</tr>
+<tr>
+<td><strong>4. Make quality measurable</strong></td>
+<td>Agree on the unit of correctness: right disposition <strong>and</strong> exact evidence ID for drafts. Independently label 20 new synthetic cases. Have a second reader adjudicate disagreements, or relabel blind a day later. Separate development from a frozen acceptance set before tuning. Slice by retailer, intent and answerability.</td>
+<td>Versioned evaluation sheet with numerator, denominator and every failure ID. Gate: no wrong-tenant or wrong-version citations, no drafts on must-handoff cases, and at least 80% correct citation coverage on answerable cases. A tiny green fixture suite is not permission to pilot.</td>
+</tr>
+<tr>
+<td><strong>5. Fit the operator's day</strong></td>
+<td>Replay one idempotent submission twice, then try changing its contents under the same ID. Reject a draft; verify it no longer waits for review. Ask the operator to identify the evidence without an engineer. Turn three objections into a ranked backlog.</td>
+<td>Five-minute workflow demo plus a review-state diagram. Gate: a replay cannot create duplicate work, conflicting reuse is visible, and the same draft cannot be reviewed twice.</td>
+</tr>
+<tr>
+<td><strong>6. Break it on purpose</strong></td>
+<td>Use the drills below on synthetic copies. Replay stale dates, a policy overlap, paraphrase drift and a burst of handoffs. Time a 100-case local run; separate cold model loading from warm inference. Sketch the production queue and trust boundary <em>without</em> building infrastructure yet.</td>
+<td>Incident timeline, workload sheet and corrected release checklist. Gate: the operator can switch to manual lookup without the engineer; recovered output passes the frozen cases before resuming.</td>
+</tr>
+<tr>
+<td><strong>7. Decide whether to pilot</strong></td>
+<td>Shadow ten more matched tasks; alternate manual-first and assistant-first order to reduce learning bias. Do not send drafts. Compute time saved <em>including reviews</em>, rejection reasons and queue capacity. If the demo looks good but capacity fails, narrow to one retailer/topic.</td>
+<td>Sponsor memo: <strong>go</strong>, <strong>limited go</strong> or <strong>no-go</strong>; attach the worst counterexample, scope, owner and reversal trigger. Gate: both operator and policy owner sign or leave an explicit blocker.</td>
+</tr>
+<tr>
+<td><strong>8. Hand off something maintainable</strong></td>
+<td>Have a peer add a policy version from the runbook without your help. Rerun cutover, isolation and handoff cases. Restore a known-good fixture if the change fails. Present the incident, the economics, a rejected design and one thing you still cannot claim.</td>
+<td>Portfolio packet: charter, architecture decision record, evaluation diff, incident review, pilot memo and operator handoff. Gate: someone else can reproduce the demo and explain how to stop it.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Weekly rhythm:</strong> Monday write down one customer decision and its owner. Midweek ship the smallest experiment that could change it. Friday demo a success <em>and a refusal</em>, log one dissent, attach evidence and agree on the next gate. If stakeholder access stalls, role-play both sides and mark the decision <strong>assumed</strong>, never <strong>approved</strong>.</p>
+<h2 id="change-orders-and-blockers">Change orders and blockers</h2>
+<p>Run these after the baseline works. The first six exercise the shipped system; the last two are design/measurement assignments. Do not overwrite the shipped benchmark to make an experiment pass.</p>
+<table>
+<thead>
+<tr>
+<th>Customer change or blocker</th>
+<th>What to look for / how to reproduce</th>
+<th>Your decision and pass condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&quot;Our returns window changed overnight.&quot;</td>
+<td>Ask the same Northstar question on 2025-06-30 and 2025-07-01. Look at evidence IDs, not just numbers in the text.</td>
+<td>Decide how to obtain the authoritative lookup date. An exclusive end date gives no overlap at midnight, and the two results cite different cards.</td>
+</tr>
+<tr>
+<td>&quot;That answer belongs to our other brand.&quot;</td>
+<td>Ask the same question for Northstar and Harbor; then try a date before either policy existed.</td>
+<td>Tenant/date selection precedes ranking. No eligible evidence means no excerpt, not a cached generic answer. A real tenant ID must come from authenticated context.</td>
+</tr>
+<tr>
+<td>&quot;Operations sent us a second, conflicting policy.&quot;</td>
+<td>In a copy of <code>data/</code>, add a card with a new ID and overlapping dates for the same tenant/topic.</td>
+<td>The policy owner decides the authoritative version. Until then the covered topic must hand off; ranking is not a conflict-resolution mechanism.</td>
+</tr>
+<tr>
+<td>&quot;We get questions about returns <em>and</em> damage.&quot;</td>
+<td>Compare a short, single-topic request with a two-topic one; inspect the reason and the reviewer workload.</td>
+<td>Pick a unit of work: one card or a multi-step plan. The shipped pilot is one card; extend it only with labeled multi-topic cases.</td>
+</tr>
+<tr>
+<td>&quot;The integration retried a message.&quot;</td>
+<td>Submit the same synthetic ID twice, then reuse it for different text. Check the pending queue after each attempt.</td>
+<td>Exact replay returns the original record; conflicting reuse fails visibly. Explain when a deliberate re-triage needs a new request ID.</td>
+</tr>
+<tr>
+<td>&quot;Customers now say 'send it home' instead of 'return'.&quot;</td>
+<td>Add a batch in a new development set using the phrase. Compare increased handoffs against wrong citations.</td>
+<td>Decide between training examples, an alias, or embeddings. Freeze the old set; report both before/after by slice. Do not teach the test questions to the model.</td>
+</tr>
+<tr>
+<td>&quot;The demo is fast but our queue is growing.&quot;</td>
+<td>Simulate 240 requests/hour with 40% handoffs taking 4 min each. Add 1 min review for each draft.</td>
+<td>Compute <code>(96*4 + 144*1)/60 = 8.8</code> reviewer-hours per arrival hour, before breaks. Reduce volume or increase staffing; faster inference alone cannot clear this queue.</td>
+</tr>
+<tr>
+<td>&quot;Can we turn on a hosted LLM tomorrow?&quot;</td>
+<td>Identify what leaves the machine, how stale citations are checked, and what happens on timeout or a budget stop.</td>
+<td>Present a buy-vs-build memo, maximum cost per <em>accepted</em> draft, fallback and deletion procedure. No real data or external model is required for this exercise.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="architecture-interview-prompts">Architecture interview prompts</h2>
+<ol>
+<li>At 100 retailers with 10,000 policies each, what breaks first in the local scan? Sketch an index keyed by tenant and time before vector search; defend how deletes and new versions propagate. Explain why filtering only after top-k can miss valid evidence.</li>
+<li>Which is worse: a wrong excerpt or a needless transfer? Put candidate costs on both with the sponsor. Show which gate changes as cost or staffing changes; leave tenant isolation a hard invariant.</li>
+<li>If you add generation, what new behavior do you buy over an exact excerpt? Specify the response schema, evidence checks, timeouts and fallback. Compare it to the shipped baseline before budgeting for it.</li>
+<li>How would a horizontally scaled service keep duplicate submissions and reviews consistent? Name the database uniqueness constraint, request fingerprint, authorization point and rollback path. Identify what a SQLite demonstration does <em>not</em> prove.</li>
+</ol>
+<h2 id="reusable-handoff-forms">Reusable handoff forms</h2>
+<p><strong>Decision record:</strong> Decision / customer owner / evidence for and against / option rejected / what would reverse it / review date.</p>
+<p><strong>Failure ledger:</strong> Case ID / expected disposition and citation / actual disposition and citation / failure layer / affected retailer / impact / smallest falsifiable fix / regression case.</p>
+<p><strong>Pilot memo:</strong> Scope and exclusion / manual vs assisted timing with sample sizes / safe coverage and false drafts / reviewer capacity at peak / recommendation / stop conditions / who owns the kill switch.</p>
+<p><strong>Portfolio rubric (0-2 each):</strong> customer problem, data contract, evaluation, operations, communication. Score 0 for an assertion, 1 for an artifact, 2 for a falsifiable observation that changed a decision. A polished demo alone cannot pass. A well-evidenced no-go can.</p>
+</main></html>
