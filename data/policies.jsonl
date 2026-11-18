@@ -1,0 +1,5 @@
+{"id":"NS-RET-1","tenant":"northstar","topic":"return_window","version":"1","effective_from":"2025-01-01","effective_until":"2025-07-01","excerpt":"Standard returns must be requested within 14 days of delivery."}
+{"id":"NS-RET-2","tenant":"northstar","topic":"return_window","version":"2","effective_from":"2025-07-01","effective_until":null,"excerpt":"Standard returns must be requested within 30 days of delivery."}
+{"id":"HB-RET-1","tenant":"harbor","topic":"return_window","version":"1","effective_from":"2025-01-01","effective_until":null,"excerpt":"Standard returns must be requested within 21 days of delivery."}
+{"id":"NS-DMG-1","tenant":"northstar","topic":"damage_steps","version":"1","effective_from":"2025-01-01","effective_until":null,"excerpt":"For an item that arrived damaged, retain the packaging and contact the desk."}
+{"id":"HB-DMG-1","tenant":"harbor","topic":"damage_steps","version":"1","effective_from":"2025-03-01","effective_until":null,"excerpt":"For an item that arrived damaged, photograph the item and contact the desk."}
